@@ -54,6 +54,10 @@ const StringWorker = {
     upperCasecFirst: str => (str ? str[0].toUpperCase() + str.slice(1) : "")
 };
 
+const Pagging = {
+    _pagging: (currentPage, pageSize) => [pageSize * currentPage - pageSize, pageSize * currentPage]
+}
+
 class TableSortable {
     constructor(items, option) {
         this.el = document.createElement("table");
@@ -61,27 +65,33 @@ class TableSortable {
         this.el.addEventListener("click", this.onClick.bind(this));
         this.el.addEventListener("keyup", this.onKeyup.bind(this));
 
-        this.option = Object.assign(
-            {
-                nameHead: {}
-            },
-            option
-        );
+        this.option = Object.assign({ 
+            nameHead: {},
+            pageSize: 5,
+            currentPage: 1
+        }, option);
 
         this.headNameRow = items.length ? Object.keys(items[0]) : [];
         this.bodyValueRows = items.length
             ? items.map(e => this.headNameRow.map(h => e[h]))
             : [];
 
-        this.filterList = this.bodyValueRows;
+        this.filterList = this.bodyValueRows
+            .slice(...this._pagging(this.option.currentPage, this.option.pageSize));
 
         this.render(true);
     }
 
     sort = (column, desc = false) => {
+        this.filterList = this.bodyValueRows;
+        
         this.filterList.sort((a, b) =>
             this._sortStrategy(desc)(a[column], b[column])
         );
+        
+        this.filterList = this.filterList.slice(...this._pagging(this.option.currentPage, this.option.pageSize));
+
+        
         this.render();
     };
 
@@ -94,7 +104,8 @@ class TableSortable {
                     res || this._filterStrategy("_start", text)(e[currIndex]),
                 false
             );
-        });
+        })
+        .slice(...this._pagging(this.option.currentPage, this.option.pageSize));;
 
         this.render();
     };
@@ -205,4 +216,4 @@ class TableSortable {
     }
 }
 
-Object.assign(TableSortable.prototype, Sort, Filter, StringWorker);
+Object.assign(TableSortable.prototype, Sort, Filter, Pagging, StringWorker);

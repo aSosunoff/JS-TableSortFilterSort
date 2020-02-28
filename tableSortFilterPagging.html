@@ -12,8 +12,9 @@
 		<div class="result"></div>
 
 		<script>
+			let table = null;
 			document.addEventListener("DOMContentLoaded", function(event) {
-				let table = new TableSortable(
+				table = new TableSortable(
 					[
 						{
 							id: 1,
