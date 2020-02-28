@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Document</title>
+		<link rel="stylesheet" href="reset-css.css" />
+		<link rel="stylesheet" href="style.css" />
+		<script src="js.js"></script>
+	</head>
+	<body>
+		<input type="text" id="filter" />
+		<div class="result"></div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", function(event) {
+				let table = new TableSortable(
+					[
+						{
+							id: 1,
+							first_name: "Kev",
+							last_name: "Richings",
+							email: "krichings0@tinyurl.com",
+							gender: "Male",
+							ip_address: "133.231.80.26"
+						},
+						{
+							id: 2,
+							first_name: "Kellen",
+							last_name: "Issit",
+							email: "kissit1@ebay.com",
+							gender: "Female",
+							ip_address: "200.196.125.123"
+						},
+						{
+							id: 3,
+							first_name: "Haskell",
+							last_name: "Blenkinsop",
+							email: "hblenkinsop2@ucoz.com",
+							gender: "Male",
+							ip_address: "53.189.209.218"
+						},
+						{
+							id: 4,
+							first_name: "Case",
+							last_name: "Brimicombe",
+							email: "cbrimicombe3@java.com",
+							gender: "Male",
+							ip_address: "2.203.99.85"
+						},
+						{
+							id: 5,
+							first_name: "Aguistin",
+							last_name: "Malpass",
+							email: "amalpass4@cnet.com",
+							gender: "Male",
+							ip_address: "44.108.137.191"
+						},
+						{
+							id: 6,
+							first_name: "Matthus",
+							last_name: "Soldi",
+							email: "msoldi5@wikipedia.org",
+							gender: "Male",
+							ip_address: "82.250.212.113"
+						},
+						{
+							id: 7,
+							first_name: "Chris",
+							last_name: "Chavez",
+							email: "cchavez6@walmart.com",
+							gender: "Female",
+							ip_address: "78.144.254.197"
+						},
+						{
+							id: 8,
+							first_name: "Marta",
+							last_name: "Grene",
+							email: "mgrene7@uol.com.br",
+							gender: "Female",
+							ip_address: "220.87.176.173"
+						},
+						{
+							id: 9,
+							first_name: "Deck",
+							last_name: "Kirkness",
+							email: "dkirkness8@g.co",
+							gender: "Male",
+							ip_address: "82.147.153.2"
+						},
+						{
+							id: 10,
+							first_name: "Marga",
+							last_name: "Gabel",
+							email: "mgabel9@networksolutions.com",
+							gender: "Female",
+							ip_address: "7.240.83.254"
+						},
+						{
+							id: 11,
+							first_name: "Lloyd",
+							last_name: "Doale",
+							email: "ldoalea@gmpg.org",
+							gender: "Male",
+							ip_address: "220.128.30.48"
+						},
+						{
+							id: 12,
+							first_name: "Hall",
+							last_name: "Van de Velde",
+							email: "hvandeveldeb@blogspot.com",
+							gender: "Male",
+							ip_address: "200.60.124.63"
+						},
+						{
+							id: 13,
+							first_name: "Bil",
+							last_name: "Jeffress",
+							email: "bjeffressc@opera.com",
+							gender: "Male",
+							ip_address: "222.25.100.71"
+						},
+						{
+							id: 14,
+							first_name: "Daniella",
+							last_name: "Shimmin",
+							email: "dshimmind@facebook.com",
+							gender: "Female",
+							ip_address: "250.9.209.81"
+						},
+						{
+							id: 15,
+							first_name: "Wakefield",
+							last_name: "McMenamin",
+							email: "wmcmenamine@japanpost.jp",
+							gender: "Male",
+							ip_address: "72.162.68.143"
+						},
+						{
+							id: 16,
+							first_name: "Karel",
+							last_name: "Norval",
+							email: "knorvalf@etsy.com",
+							gender: "Male",
+							ip_address: "71.182.6.225"
+						},
+						{
+							id: 17,
+							first_name: "Darla",
+							last_name: "Rosenbush",
+							email: "drosenbushg@nsw.gov.au",
+							gender: "Female",
+							ip_address: "52.244.62.204"
+						},
+						{
+							id: 18,
+							first_name: "Corbin",
+							last_name: "Pallis",
+							email: "cpallish@hhs.gov",
+							gender: "Male",
+							ip_address: "218.17.170.221"
+						},
+						{
+							id: 19,
+							first_name: "Linette",
+							last_name: "Acome",
+							email: "lacomei@go.com",
+							gender: "Female",
+							ip_address: "188.37.128.26"
+						},
+						{
+							id: 20,
+							first_name: "Lucila",
+							last_name: "Gregoratti",
+							email: "lgregorattij@eepurl.com",
+							gender: "Female",
+							ip_address: "161.131.36.22"
+						},
+						{
+							id: 21,
+							first_name: "Ferris",
+							last_name: "Geroldo",
+							email: "fgeroldok@youtu.be",
+							gender: "Male",
+							ip_address: "32.63.4.20"
+						},
+						{
+							id: 22,
+							first_name: "Mirabel",
+							last_name: "Sleit",
+							email: "msleitl@baidu.com",
+							gender: "Female",
+							ip_address: "115.134.89.161"
+						},
+						{
+							id: 23,
+							first_name: "Barnett",
+							last_name: "Deane",
+							email: "bdeanem@newsvine.com",
+							gender: "Male",
+							ip_address: "183.171.136.130"
+						},
+						{
+							id: 24,
+							first_name: "Gayelord",
+							last_name: "Cream",
+							email: "gcreamn@imdb.com",
+							gender: "Male",
+							ip_address: "78.83.189.214"
+						},
+						{
+							id: 25,
+							first_name: "Yanaton",
+							last_name: "Crosen",
+							email: "ycroseno@slashdot.org",
+							gender: "Male",
+							ip_address: "166.112.109.210"
+						},
+						{
+							id: 26,
+							first_name: "Kimbell",
+							last_name: "Kennet",
+							email: "kkennetp@cnbc.com",
+							gender: "Male",
+							ip_address: "245.160.1.188"
+						},
+						{
+							id: 27,
+							first_name: "Deonne",
+							last_name: "Knightley",
+							email: "dknightleyq@multiply.com",
+							gender: "Female",
+							ip_address: "8.88.5.71"
+						},
+						{
+							id: 28,
+							first_name: "Fernande",
+							last_name: "Burnell",
+							email: "fburnellr@ed.gov",
+							gender: "Female",
+							ip_address: "118.227.23.76"
+						},
+						{
+							id: 29,
+							first_name: "Vito",
+							last_name: "Parrish",
+							email: "vparrishs@hp.com",
+							gender: "Male",
+							ip_address: "204.115.137.54"
+						},
+						{
+							id: 30,
+							first_name: "Nettie",
+							last_name: "Darell",
+							email: "ndarellt@cdbaby.com",
+							gender: "Female",
+							ip_address: "185.39.115.74"
+						}
+					],
+					{
+						nameHead: {
+							id: "№",
+							first_name: "Имя",
+							last_name: "Фамилия"
+						}
+					}
+				);
+
+				let result = document.querySelector(".result");
+				result.replaceWith(table.el);
+
+				let filter = document.querySelector("#filter");
+				filter.addEventListener("keyup", event => {
+					table.filter(event.target.value);
+				});
+			});
+		</script>
+	</body>
+</html>
