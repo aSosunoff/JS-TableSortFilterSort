@@ -9,7 +9,6 @@
 		<script src="js.js"></script>
 	</head>
 	<body>
-		<input type="text" id="filter" />
 		<div class="result"></div>
 
 		<script>
@@ -268,11 +267,6 @@
 
 				let result = document.querySelector(".result");
 				result.replaceWith(table.el);
-
-				let filter = document.querySelector("#filter");
-				filter.addEventListener("keyup", event => {
-					table.filter(event.target.value);
-				});
 			});
 		</script>
 	</body>

@@ -59,6 +59,7 @@ class TableSortable {
         this.el = document.createElement("table");
         this.el.className = "table-sortable";
         this.el.addEventListener("click", this.onClick.bind(this));
+        this.el.addEventListener("keyup", this.onKeyup.bind(this));
 
         this.option = Object.assign(
             {
@@ -123,7 +124,12 @@ class TableSortable {
                 .join("")}</td>`;
         }, "");
 
-        return `<thead><tr class='table-sortable__head-row'>${tds}<tr></thead>`;
+        return `<thead>
+            <tr class='table-sortable__head-row'>${tds}<tr>
+            <tr class='table-sortable__sort-row'>${
+                this.headNameRow.reduce((res, curr) => `${res}<td class='table-sortable__sort-cell'><input class='table-sortable__input' type="text"/></td>`,'')
+            }</tr>
+            </thead>`;
     };
 
     getBodyHtml = function(callbackFormat) {
@@ -138,10 +144,6 @@ class TableSortable {
             )
             .join("");
         return `<tbody>${trs}</tbody>`;
-    };
-
-    THEAD = {
-        onClick: () => {}
     };
 
     strategyOnClick(cls, event) {
@@ -178,8 +180,28 @@ class TableSortable {
         this.sort(tdHead.cellIndex, desc);
     }
 
+    table_sortable__input(cls, event) {
+        let inputFilter = event.target.closest(cls);
+
+        if (!inputFilter) return;
+
+        let td = inputFilter.closest('td');
+
+        if (!td) return;
+
+        let cells = this.el.querySelectorAll('.table-sortable__sort-cell');
+
+        let indexs = Array.from(cells).filter(e => e.querySelector('.table-sortable__input').value).map(m => m.cellIndex);
+
+        this.filter(inputFilter.value, ...indexs);
+    }
+
     onClick(event) {
         this.strategyOnClick(".table-sortable__head-cell", event);
+    }
+
+    onKeyup(event) {
+        this.strategyOnClick(".table-sortable__input", event);
     }
 }
 
