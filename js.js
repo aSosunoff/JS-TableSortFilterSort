@@ -55,7 +55,7 @@ const StringWorker = {
 };
 
 const Pagging = {
-    _pagging: (currentPage, pageSize) => [pageSize * currentPage - pageSize, pageSize * currentPage]
+    _pagging: (currentPage, pageSize) => pageSize ? [pageSize * currentPage - pageSize, pageSize * currentPage] : [0]
 }
 
 class TableSortable {
@@ -68,7 +68,11 @@ class TableSortable {
         this.option = Object.assign({ 
             nameHead: {},
             pageSize: 5,
-            currentPage: 1
+            currentPage: 1,
+            sort: {
+                column: null,
+                desc: false
+            }
         }, option);
 
         this.headNameRow = items.length ? Object.keys(items[0]) : [];
@@ -82,35 +86,77 @@ class TableSortable {
         this.render(true);
     }
 
-    sort = (column, desc = false) => {
-        this.filterList = this.bodyValueRows;
-        
+    _sort = (column, desc = false) => {
         this.filterList.sort((a, b) =>
             this._sortStrategy(desc)(a[column], b[column])
         );
         
-        this.filterList = this.filterList.slice(...this._pagging(this.option.currentPage, this.option.pageSize));
-
-        
-        this.render();
+        this.option.sort.column = column;
+        this.option.sort.desc = desc;
     };
 
-    filter = (text, ...column) => {
-        this.filterList = this.bodyValueRows.filter(e => {
-            if (!column.length) return true;
+    _filter = () => {
+        let cells = this.el.querySelectorAll('.table-sortable__sort-cell');
 
-            return column.reduce(
+        let indexs = Array.from(cells)
+            .filter(e => e.querySelector('.table-sortable__input').value)
+            .map(m => {
+                return {
+                    index: m.cellIndex,
+                    value: m.querySelector('.table-sortable__input').value
+                };
+            });
+        
+        this.filterList = this.bodyValueRows.filter(e => {
+            if (!indexs.length) return true;
+
+            return indexs.reduce(
                 (res, currIndex) =>
-                    res || this._filterStrategy("_start", text)(e[currIndex]),
+                    res || this._filterStrategy("_start", currIndex.value)(e[currIndex.index]),
                 false
             );
-        })
-        .slice(...this._pagging(this.option.currentPage, this.option.pageSize));;
+        });
+    }
 
+    sort = (column, desc = false) => {
+        this.option.sort.column = column;
+        this.option.sort.desc = desc;
         this.render();
     };
 
+    filter = () => {
+        this.render();
+    };
+
+    nextPage(){
+        let fuctPage = Math.ceil(this.filterList.length / this.option.pageSize);
+        
+        this.option.currentPage = fuctPage > this.option.currentPage ? ++this.option.currentPage : fuctPage;
+
+        this.render();
+    }
+
+    prevPage(){
+        this.option.currentPage = 1 >= this.option.currentPage ? 1 : --this.option.currentPage;
+
+        this.render();
+    }
+
+    currentPage(page){
+        let fuctPage = Math.ceil(this.filterList.length / this.option.pageSize);
+
+        if(1 <= page && fuctPage >= page)
+            this.option.currentPage = page;
+        
+        this.option.currentPage = 1 > page ? 1 : fuctPage;
+
+        this.render();
+    }
+
     render(printHead = false) {
+        this._filter();
+        this._sort(this.option.sort.column, this.option.sort.desc);
+
         if (printHead) {
             this.el.innerHTML = `${this.getHeadHtml(trObject => {
                 trObject.splice(0, 1, this.upperCasecFirst(trObject[0]));
@@ -144,9 +190,9 @@ class TableSortable {
     };
 
     getBodyHtml = function(callbackFormat) {
-        callbackFormat =
-            typeof callbackFormat == "function" ? callbackFormat : e => e;
-        let trs = this.filterList
+        callbackFormat = typeof callbackFormat == "function" ? callbackFormat : e => e;
+
+        let trs = this.filterList.slice(...this._pagging(this.option.currentPage, this.option.pageSize))
             .map(
                 e =>
                     `<tr class='table-sortable__body-row'>${callbackFormat(e)
@@ -196,15 +242,7 @@ class TableSortable {
 
         if (!inputFilter) return;
 
-        let td = inputFilter.closest('td');
-
-        if (!td) return;
-
-        let cells = this.el.querySelectorAll('.table-sortable__sort-cell');
-
-        let indexs = Array.from(cells).filter(e => e.querySelector('.table-sortable__input').value).map(m => m.cellIndex);
-
-        this.filter(inputFilter.value, ...indexs);
+        this.filter();
     }
 
     onClick(event) {
