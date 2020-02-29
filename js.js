@@ -119,10 +119,8 @@ class TableSortable {
             if (!indexs.length) return true;
 
             return indexs.reduce(
-                (res, currIndex) =>
-                    res || this._filterStrategy("_start", currIndex.value)(e[currIndex.index]),
-                false
-            );
+                (res, currIndex) => res || this._filterStrategy("_start", currIndex.value)(e[currIndex.index])
+                , false);
         });
     }
 
@@ -145,31 +143,28 @@ class TableSortable {
     }
 
     currentPage(page){
-        let fuctPage = Math.ceil(this.filterList.length / this.option.pageSize);
+        let finishPage = Math.ceil(this.filterList.length / this.option.pageSize);
 
-        this.option.currentPage = this._isBetween(page, 1, fuctPage) 
+        this.option.currentPage = this._isBetween(page, 1, finishPage) 
             ? page 
-            : (1 > page ? 1 : fuctPage);
+            : (1 > page ? 1 : finishPage);
         
         this.render();
     }
 
     render(printHead = false) {
-        this._filter();
-        this._sort(this.option.sort.column, this.option.sort.desc);
-
         if (printHead) {
-            this.el.innerHTML = `${this.getHeadHtml(trObject => {
+            this.el.innerHTML = `${this.renderHeadHtml(trObject => {
                 trObject.splice(0, 1, this.upperCasecFirst(trObject[0]));
                 return trObject;
-            })}${this.getBodyHtml()}`;
+            })}${this.renderBodyHtml()}`;
         } else {
             let body = this.el.querySelector("tbody");
-            body.innerHTML = this.getBodyHtml();
+            body.innerHTML = this.renderBodyHtml();
         }
     }
 
-    getHeadHtml = function(callbackFormat) {
+    renderHeadHtml = function(callbackFormat) {
         callbackFormat =
             typeof callbackFormat == "function" ? callbackFormat : e => e;
 
@@ -190,8 +185,11 @@ class TableSortable {
             </thead>`;
     };
 
-    getBodyHtml = function(callbackFormat) {
+    renderBodyHtml = function(callbackFormat) {
         callbackFormat = typeof callbackFormat == "function" ? callbackFormat : e => e;
+
+        this._filter();
+        this._sort(this.option.sort.column, this.option.sort.desc);
 
         let trs = this.filterList.slice(...this._pagging(this.option.currentPage, this.option.pageSize))
             .map(
