@@ -55,7 +55,15 @@ const StringWorker = {
 };
 
 const Pagging = {
-    _pagging: (currentPage, pageSize) => pageSize ? [pageSize * currentPage - pageSize, pageSize * currentPage] : [0]
+    _pagging: (currentPage, pageSize) => pageSize ? [pageSize * currentPage - pageSize, pageSize * currentPage] : [0],
+    _isBetween: (number, start, end) => {
+        if(!end && end != 0) {
+            end = start;
+            start = 0;
+        }
+    
+        return Math.min(start, end) <= number && number <= Math.max(start, end);
+    }
 }
 
 class TableSortable {
@@ -129,27 +137,20 @@ class TableSortable {
     };
 
     nextPage(){
-        let fuctPage = Math.ceil(this.filterList.length / this.option.pageSize);
-        
-        this.option.currentPage = fuctPage > this.option.currentPage ? ++this.option.currentPage : fuctPage;
-
-        this.render();
+        this.currentPage(++this.option.currentPage);
     }
 
     prevPage(){
-        this.option.currentPage = 1 >= this.option.currentPage ? 1 : --this.option.currentPage;
-
-        this.render();
+        this.currentPage(--this.option.currentPage);
     }
 
     currentPage(page){
         let fuctPage = Math.ceil(this.filterList.length / this.option.pageSize);
 
-        if(1 <= page && fuctPage >= page)
-            this.option.currentPage = page;
+        this.option.currentPage = this._isBetween(page, 1, fuctPage) 
+            ? page 
+            : (1 > page ? 1 : fuctPage);
         
-        this.option.currentPage = 1 > page ? 1 : fuctPage;
-
         this.render();
     }
 
