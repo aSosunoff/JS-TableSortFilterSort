@@ -70,12 +70,12 @@ class TableSortable {
     constructor(items, option) {
         this.el = document.createElement("div");
         this.el.className = "container-table";
+        this.el.addEventListener("click", this.onClick.bind(this));
+        this.el.addEventListener("keyup", this.onKeyup.bind(this));
 
         let table = document.createElement("table");
         table.className = "table-sortable";
-        table.addEventListener("click", this.onClick.bind(this));
-        table.addEventListener("keyup", this.onKeyup.bind(this));
-
+        
         this.el.append(table);
 
         this.option = Object.assign({ 
@@ -230,7 +230,12 @@ class TableSortable {
             result = `<div class='table-sortable__pagging-element'>${countPage--}</div>${result}`;
         }
         
-        let paggingLine = `<div class='table-sortable__pagging-box'>${result}</div>`;
+        let paggingLine = `
+        <div class='table-sortable__pagging-box'>
+            <div class='table-sortable__pagging-element_prev'><<</div>
+            ${result}
+            <div class='table-sortable__pagging-element_next'>>></div>
+        </div>`;
 
         let paggingBox = this.el.querySelector('.table-sortable__pagging-box');
         
