@@ -48,20 +48,22 @@
 }
 
 .table-sortable__pagging-box {
-	display: flex;
+	display: grid;
+    grid-template-columns: repeat(auto-fit, 40px);
     justify-content: center;
+    gap: 5px;
 }
 
 .table-sortable__pagging-element,
 .table-sortable__pagging-element_prev,
 .table-sortable__pagging-element_next,
 .table-sortable__pagging-element_active {
-	cursor: pointer;
-	background-color: #ffffff;
-	margin-right: 5px;
-	padding: 10px;
-	transition: all 0.2s ease-in;
-	border: 1px solid #a0a0a0;
+    cursor: pointer;
+    background-color: #ffffff;
+    padding: 10px 0px;
+    transition: all 0.2s ease-in;
+    border: 1px solid #a0a0a0;
+    text-align: center;
 }
 
 .table-sortable__pagging-element:hover,
