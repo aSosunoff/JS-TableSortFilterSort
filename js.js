@@ -216,6 +216,10 @@ class TableSortable {
 
         this._filter();
         this._sort(this.option.sort.column, this.option.sort.desc);
+debugger;
+        let countPage = Math.ceil(this.filterList.length / this.option.pageSize);
+
+        this.option.currentPage = Math.min(countPage, this.option.currentPage);
 
         let trs = this.filterList.slice(...this._pagging(this.option.currentPage, this.option.pageSize))
             .map(

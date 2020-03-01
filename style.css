@@ -1,3 +1,9 @@
+.container-table{
+	display: grid;
+	width: 760px;
+	margin: 0 auto;
+}
+
 .table-sortable {
 	border-collapse: separate;
 	border-spacing: 2px;
