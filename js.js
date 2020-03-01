@@ -103,7 +103,13 @@ class TableSortable {
                 column: null,
                 desc: false
             }
-        }, option);
+        }, option, {
+            countPage: () => Math.ceil(this.filterList.length / this.option.pageSize)
+        });
+
+        this.option = Object.assign(this.option, {
+            countPage: () => Math.ceil(this.filterList.length / this.option.pageSize)
+        });
 
         this.headNameRow = items.length ? Object.keys(items[0]) : [];
         this.bodyValueRows = items.length
@@ -165,11 +171,9 @@ class TableSortable {
     }
 
     currentPage(page){
-        let countPage = Math.ceil(this.filterList.length / this.option.pageSize);
-
-        this.option.currentPage = this._isBetween(page, 1, countPage) 
+        this.option.currentPage = this._isBetween(page, 1, this.option.countPage()) 
             ? page 
-            : (1 > page ? 1 : countPage);
+            : (1 > page ? 1 : this.option.countPage());
         
         this.render();
     }
@@ -216,10 +220,8 @@ class TableSortable {
 
         this._filter();
         this._sort(this.option.sort.column, this.option.sort.desc);
-debugger;
-        let countPage = Math.ceil(this.filterList.length / this.option.pageSize);
 
-        this.option.currentPage = Math.min(countPage, this.option.currentPage);
+        this.option.currentPage = Math.min(this.option.countPage(), this.option.currentPage);
 
         let trs = this.filterList.slice(...this._pagging(this.option.currentPage, this.option.pageSize))
             .map(
