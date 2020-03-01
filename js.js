@@ -66,6 +66,23 @@ const Pagging = {
     }
 }
 
+/**
+ * @param {Function} fn
+ * @returns {Function} Возвращает каррированную функцию следующего аргумента
+*/
+function curry(fn, self){
+    self = self || this;
+	return function curried (...a) {
+		if(a.length >= fn.length){
+			return fn.apply(self, a);
+		} else {
+			return (...a2) => {
+				return curried.apply(self, [...a, ...a2]);
+			};
+		}
+	}
+}
+
 class TableSortable {
     constructor(items, option) {
         this.el = document.createElement("div");
@@ -227,7 +244,14 @@ class TableSortable {
         let result = '';
 
         while(countPage){
-            result = `<div class='table-sortable__pagging-element'>${countPage--}</div>${result}`;
+            let cls = '';
+            if(this.option.currentPage == countPage){
+                cls = 'table-sortable__pagging-element_active';
+            } else {
+                cls = 'table-sortable__pagging-element';
+            }
+            result = `<div class='${cls}' data-page-number=${countPage}>${countPage}</div>${result}`;
+            countPage--;
         }
         
         let paggingLine = `
@@ -243,11 +267,6 @@ class TableSortable {
             paggingBox.remove();
 
         this.el.insertAdjacentHTML('beforeend', paggingLine);
-    }
-
-    strategyOnClick(cls, event) {
-        let method = cls.replace(".", "").replace(new RegExp("-", "g"), "_");
-        if (this[method]) this[method](cls, event);
     }
 
     table_sortable__head_cell(cls, event) {
@@ -288,12 +307,48 @@ class TableSortable {
         this.filter();
     }
 
+    table_sortable__pagging_element_prev(cls, event){
+        let prev = event.target.closest(cls);
+
+        if (!prev) return;
+
+        this.prevPage();
+    }
+
+    table_sortable__pagging_element_next(cls, event){
+        let next = event.target.closest(cls);
+
+        if (!next) return;
+
+        this.nextPage();
+    }
+
+    table_sortable__pagging_element(cls, event){
+        let page = event.target.closest(cls);
+
+        if (!page) return;
+
+        this.currentPage(page.dataset.pageNumber);
+    }
+
     onClick(event) {
-        this.strategyOnClick(".table-sortable__head-cell", event);
+        [
+            '.table-sortable__head-cell', 
+            '.table-sortable__pagging-element_prev', 
+            '.table-sortable__pagging-element_next', 
+            '.table-sortable__pagging-element'
+        ].forEach(cls => {
+            this._strategyOnClick(event, cls);
+        });
     }
 
     onKeyup(event) {
-        this.strategyOnClick(".table-sortable__input", event);
+        this._strategyOnClick(event, ".table-sortable__input");
+    }
+
+    _strategyOnClick(event, cls) {
+        let method = cls.replace(".", "").replace(new RegExp("-", "g"), "_");
+        if (this[method]) this[method](cls, event);
     }
 }
 

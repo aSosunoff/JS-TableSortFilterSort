@@ -48,7 +48,8 @@
 
 .table-sortable__pagging-element,
 .table-sortable__pagging-element_prev,
-.table-sortable__pagging-element_next {
+.table-sortable__pagging-element_next,
+.table-sortable__pagging-element_active {
 	cursor: pointer;
 	background-color: #ffffff;
 	margin-right: 5px;
@@ -60,6 +61,11 @@
 .table-sortable__pagging-element:hover,
 .table-sortable__pagging-element_prev:hover,
 .table-sortable__pagging-element_next:hover{
+	background-color: #57a6ff;
+	box-shadow: 5px 5px 8px 0px #c1c1c1;
+}
+
+.table-sortable__pagging-element_active{
 	background-color: #57a6ff;
 	box-shadow: 5px 5px 8px 0px #c1c1c1;
 }
