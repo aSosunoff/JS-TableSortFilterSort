@@ -36,7 +36,26 @@
 	box-sizing: border-box;
 }
 
-.table-sortable__input:focus{
-    transition: all 0.2s ease-in;
-    background-color: #c2dfff; 
+.table-sortable__input:focus {
+	transition: all 0.2s ease-in;
+	background-color: #c2dfff;
+}
+
+.table-sortable__pagging-box {
+	display: flex;
+    justify-content: center;
+}
+
+.table-sortable__pagging-element {
+	cursor: pointer;
+	background-color: #ffffff;
+	margin-right: 5px;
+	padding: 10px;
+	transition: all 0.2s ease-in;
+	border: 1px solid #a0a0a0;
+}
+
+.table-sortable__pagging-element:hover{
+	background-color: #57a6ff;
+	box-shadow: 5px 5px 8px 0px #c1c1c1;
 }

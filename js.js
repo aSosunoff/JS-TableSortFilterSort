@@ -68,10 +68,15 @@ const Pagging = {
 
 class TableSortable {
     constructor(items, option) {
+        this.container = document.createElement("div");
+        this.container.className = "container-table";
+
         this.el = document.createElement("table");
         this.el.className = "table-sortable";
         this.el.addEventListener("click", this.onClick.bind(this));
         this.el.addEventListener("keyup", this.onKeyup.bind(this));
+
+        this.container.append(this.el);
 
         this.option = Object.assign({ 
             nameHead: {},
@@ -104,7 +109,7 @@ class TableSortable {
     };
 
     _filter = () => {
-        let cells = this.el.querySelectorAll('.table-sortable__sort-cell');
+        let cells = this.container.querySelectorAll('.table-sortable__sort-cell');
 
         let indexs = Array.from(cells)
             .filter(e => e.querySelector('.table-sortable__input').value)
@@ -143,49 +148,53 @@ class TableSortable {
     }
 
     currentPage(page){
-        let finishPage = Math.ceil(this.filterList.length / this.option.pageSize);
+        let countPage = Math.ceil(this.filterList.length / this.option.pageSize);
 
-        this.option.currentPage = this._isBetween(page, 1, finishPage) 
+        this.option.currentPage = this._isBetween(page, 1, countPage) 
             ? page 
-            : (1 > page ? 1 : finishPage);
+            : (1 > page ? 1 : countPage);
         
         this.render();
     }
 
     render(printHead = false) {
         if (printHead) {
-            this.el.innerHTML = `${this.renderHeadHtml(trObject => {
+            this.renderHeadHtml(trObject => {
                 trObject.splice(0, 1, this.upperCasecFirst(trObject[0]));
                 return trObject;
-            })}${this.renderBodyHtml()}`;
-        } else {
-            let body = this.el.querySelector("tbody");
-            body.innerHTML = this.renderBodyHtml();
+            });
         }
+
+        this.renderBodyHtml();
     }
 
-    renderHeadHtml = function(callbackFormat) {
-        callbackFormat =
-            typeof callbackFormat == "function" ? callbackFormat : e => e;
+    renderHeadHtml(callbackFormat) {
+        callbackFormat = typeof callbackFormat == "function" ? callbackFormat : e => e;
 
         let tds = this.headNameRow.reduce((res, curr) => {
             curr = this.option.nameHead[curr] || curr;
-            return `${res}<td class='table-sortable__head-cell'>${callbackFormat(
-                [curr]
-            )
+            return `${res}<td class='table-sortable__head-cell'>${callbackFormat([curr])
                 .map(e => e)
                 .join("")}</td>`;
         }, "");
 
-        return `<thead>
+        let thead = this.container.querySelector('thead');
+        
+        if(thead)
+            thead.remove();
+
+        let table = this.container.querySelector('table');
+
+        table.insertAdjacentHTML('afterbegin', `
+        <thead>
             <tr class='table-sortable__head-row'>${tds}<tr>
             <tr class='table-sortable__sort-row'>${
                 this.headNameRow.reduce((res, curr) => `${res}<td class='table-sortable__sort-cell'><input class='table-sortable__input' type="text"/></td>`,'')
             }</tr>
-            </thead>`;
+        </thead>`);
     };
 
-    renderBodyHtml = function(callbackFormat) {
+    renderBodyHtml(callbackFormat) {
         callbackFormat = typeof callbackFormat == "function" ? callbackFormat : e => e;
 
         this._filter();
@@ -199,8 +208,37 @@ class TableSortable {
                         .join("")}</tr>`
             )
             .join("");
-        return `<tbody>${trs}</tbody>`;
+
+        let tbody = this.container.querySelector('tbody');
+        
+        if(tbody)
+            tbody.remove();
+
+        let table = this.container.querySelector('table');
+
+        table.insertAdjacentHTML('beforeend', `<tbody>${trs}</tbody>`);
+        
+        this._renderPaging();
     };
+
+    _renderPaging(){
+        let countPage = Math.ceil(this.filterList.length / this.option.pageSize);
+        
+        let result = '';
+
+        while(countPage){
+            result = `<div class='table-sortable__pagging-element'>${countPage--}</div>${result}`;
+        }
+        
+        let paggingLine = `<div class='table-sortable__pagging-box'>${result}</div>`;
+
+        let paggingBox = this.container.querySelector('.table-sortable__pagging-box');
+        
+        if(paggingBox)
+            paggingBox.remove();
+
+        this.container.insertAdjacentHTML('beforeend', paggingLine);
+    }
 
     strategyOnClick(cls, event) {
         let method = cls.replace(".", "").replace(new RegExp("-", "g"), "_");
