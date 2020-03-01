@@ -68,15 +68,15 @@ const Pagging = {
 
 class TableSortable {
     constructor(items, option) {
-        this.container = document.createElement("div");
-        this.container.className = "container-table";
+        this.el = document.createElement("div");
+        this.el.className = "container-table";
 
-        this.el = document.createElement("table");
-        this.el.className = "table-sortable";
-        this.el.addEventListener("click", this.onClick.bind(this));
-        this.el.addEventListener("keyup", this.onKeyup.bind(this));
+        let table = document.createElement("table");
+        table.className = "table-sortable";
+        table.addEventListener("click", this.onClick.bind(this));
+        table.addEventListener("keyup", this.onKeyup.bind(this));
 
-        this.container.append(this.el);
+        this.el.append(table);
 
         this.option = Object.assign({ 
             nameHead: {},
@@ -109,7 +109,7 @@ class TableSortable {
     };
 
     _filter = () => {
-        let cells = this.container.querySelectorAll('.table-sortable__sort-cell');
+        let cells = this.el.querySelectorAll('.table-sortable__sort-cell');
 
         let indexs = Array.from(cells)
             .filter(e => e.querySelector('.table-sortable__input').value)
@@ -178,12 +178,12 @@ class TableSortable {
                 .join("")}</td>`;
         }, "");
 
-        let thead = this.container.querySelector('thead');
+        let thead = this.el.querySelector('thead');
         
         if(thead)
             thead.remove();
 
-        let table = this.container.querySelector('table');
+        let table = this.el.querySelector('table');
 
         table.insertAdjacentHTML('afterbegin', `
         <thead>
@@ -209,15 +209,15 @@ class TableSortable {
             )
             .join("");
 
-        let tbody = this.container.querySelector('tbody');
+        let tbody = this.el.querySelector('tbody');
         
         if(tbody)
             tbody.remove();
 
-        let table = this.container.querySelector('table');
+        let table = this.el.querySelector('table');
 
         table.insertAdjacentHTML('beforeend', `<tbody>${trs}</tbody>`);
-        
+
         this._renderPaging();
     };
 
@@ -232,12 +232,12 @@ class TableSortable {
         
         let paggingLine = `<div class='table-sortable__pagging-box'>${result}</div>`;
 
-        let paggingBox = this.container.querySelector('.table-sortable__pagging-box');
+        let paggingBox = this.el.querySelector('.table-sortable__pagging-box');
         
         if(paggingBox)
             paggingBox.remove();
 
-        this.container.insertAdjacentHTML('beforeend', paggingLine);
+        this.el.insertAdjacentHTML('beforeend', paggingLine);
     }
 
     strategyOnClick(cls, event) {
@@ -264,6 +264,7 @@ class TableSortable {
         }
 
         let tds = this.el.querySelectorAll(cls);
+
         tds.forEach(td => {
             if (td != tdHead) {
                 td.classList.remove("asc");
