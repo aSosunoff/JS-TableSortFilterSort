@@ -84,40 +84,54 @@ function curry(fn, self){
 }
 
 class TableSortable {
+    static _createElement(tag, cls){
+        let el = document.createElement(tag);
+        el.className = cls;
+        return el;
+    }
+
     constructor(items, option) {
-        this.el = document.createElement("div");
-        this.el.className = "container-table";
-        this.el.addEventListener("click", this.onClick.bind(this));
-        this.el.addEventListener("keyup", this.onKeyup.bind(this));
+        this.els = {
+            el: TableSortable._createElement("div", "grid-table"),
+            head: TableSortable._createElement("div", "grid-table__head"),
+            filter: TableSortable._createElement("div", "grid-table__filter"),
+            body: TableSortable._createElement("div", "grid-table__body"),
+            paging: TableSortable._createElement("div", "grid-table__pagging")
+        }
 
-        let table = document.createElement("table");
-        table.className = "table-sortable";
-        
-        this.el.append(table);
+        this.els.el.addEventListener("click", this.onClick.bind(this));
+        this.els.el.addEventListener("keyup", this.onKeyup.bind(this));
 
-        this.option = Object.assign({ 
+        this.els.el.append(this.els.head);
+        this.els.el.append(this.els.filter);
+        this.els.el.append(this.els.body);
+        this.els.el.append(this.els.paging);
+
+        this.option = Object.assign({
             nameHead: {},
-            pageSize: 5,
-            currentPage: 1,
+            pagging: {
+                pageSize: 5,
+                currentPage: 1,
+            },
             sort: {
                 column: null,
                 desc: false
             }
         }, option, {
-            countPage: () => Math.ceil(this.filterList.length / this.option.pageSize)
+            countPage: () => Math.ceil(this.filterList.length / this.option.pagging.pageSize)
         });
 
         this.option = Object.assign(this.option, {
-            countPage: () => Math.ceil(this.filterList.length / this.option.pageSize)
+            countPage: () => Math.ceil(this.filterList.length / this.option.pagging.pageSize)
         });
 
         this.headNameRow = items.length ? Object.keys(items[0]) : [];
         this.bodyValueRows = items.length
-            ? items.map(e => this.headNameRow.map(h => e[h]))
+            ? items
             : [];
 
         this.filterList = this.bodyValueRows
-            .slice(...this._pagging(this.option.currentPage, this.option.pageSize));
+            .slice(...this._pagging(this.option.pagging.currentPage, this.option.pagging.pageSize));
 
         this.render(true);
     }
@@ -132,14 +146,14 @@ class TableSortable {
     };
 
     _filter = () => {
-        let cells = this.el.querySelectorAll('.table-sortable__sort-cell');
+        let cells = this.els.filter.querySelectorAll('.grid-table__element-input');
 
         let indexs = Array.from(cells)
-            .filter(e => e.querySelector('.table-sortable__input').value)
+            .filter(e => e.value)
             .map(m => {
                 return {
-                    index: m.cellIndex,
-                    value: m.querySelector('.table-sortable__input').value
+                    index: m.dataset.filterCollumn,
+                    value: m.value
                 };
             });
         
@@ -163,15 +177,15 @@ class TableSortable {
     };
 
     nextPage(){
-        this.currentPage(++this.option.currentPage);
+        this.currentPage(++this.option.pagging.currentPage);
     }
 
     prevPage(){
-        this.currentPage(--this.option.currentPage);
+        this.currentPage(--this.option.pagging.currentPage);
     }
 
     currentPage(page){
-        this.option.currentPage = this._isBetween(page, 1, this.option.countPage()) 
+        this.option.pagging.currentPage = this._isBetween(page, 1, this.option.countPage()) 
             ? page 
             : (1 > page ? 1 : this.option.countPage());
         
@@ -193,26 +207,26 @@ class TableSortable {
         callbackFormat = typeof callbackFormat == "function" ? callbackFormat : e => e;
 
         let tds = this.headNameRow.reduce((res, curr) => {
+            let nameCollumn = curr;
+
             curr = this.option.nameHead[curr] || curr;
-            return `${res}<td class='table-sortable__head-cell'>${callbackFormat([curr])
+
+            return `${res}<div class='grid-table__element' data-name-collumn='${nameCollumn}'>${callbackFormat([curr])
                 .map(e => e)
-                .join("")}</td>`;
+                .join("")}</div>`;
         }, "");
 
-        let thead = this.el.querySelector('thead');
+        this.els.head.innerHTML = '';
         
-        if(thead)
-            thead.remove();
+        this.els.head.insertAdjacentHTML('afterbegin', tds);
 
-        let table = this.el.querySelector('table');
+        this.els.filter.innerHTML = '';
 
-        table.insertAdjacentHTML('afterbegin', `
-        <thead>
-            <tr class='table-sortable__head-row'>${tds}<tr>
-            <tr class='table-sortable__sort-row'>${
-                this.headNameRow.reduce((res, curr) => `${res}<td class='table-sortable__sort-cell'><input class='table-sortable__input' type="text"/></td>`,'')
-            }</tr>
-        </thead>`);
+        this.els.filter.insertAdjacentHTML('afterbegin', this
+            .headNameRow
+            .reduce((res, curr) => {
+                return `${res}<div class='grid-table__element'><input class="grid-table__element-input" data-filter-collumn='${curr}' type="text"/></div>`;
+            },''));
     };
 
     renderBodyHtml(callbackFormat) {
@@ -221,99 +235,98 @@ class TableSortable {
         this._filter();
         this._sort(this.option.sort.column, this.option.sort.desc);
 
-        this.option.currentPage = Math.min(this.option.countPage(), this.option.currentPage);
+        this.option.pagging.currentPage = Math.min(this.option.countPage(), this.option.pagging.currentPage);
 
-        let trs = this.filterList.slice(...this._pagging(this.option.currentPage, this.option.pageSize))
+        let trs = this.filterList.slice(...this._pagging(this.option.pagging.currentPage, this.option.pagging.pageSize))
             .map(
-                e =>
-                    `<tr class='table-sortable__body-row'>${callbackFormat(e)
-                        .map(i => `<td class='table-sortable__body-cell'>${i}</td>`)
-                        .join("")}</tr>`
+                e => `<div class='grid-table__col'>${callbackFormat(Object.values(e).map(e => e))
+                        .map(i => `<div class='grid-table__element'>${i}</div>`)
+                        .join("")}</div>`
             )
             .join("");
 
-        let tbody = this.el.querySelector('tbody');
-        
-        if(tbody)
-            tbody.remove();
+        this.els.body.innerHTML = '';
 
-        let table = this.el.querySelector('table');
-
-        table.insertAdjacentHTML('beforeend', `<tbody>${trs}</tbody>`);
+        this.els.body.insertAdjacentHTML('afterbegin', trs);
 
         this._renderPaging();
     };
 
     _renderPaging(){
-        let countPage = Math.ceil(this.filterList.length / this.option.pageSize);
+        let countPage = Math.ceil(this.filterList.length / this.option.pagging.pageSize);
         
         let result = '';
 
         while(countPage){
             let cls = '';
-            if(this.option.currentPage == countPage){
-                cls = 'table-sortable__pagging-element_active';
+            if(this.option.pagging.currentPage == countPage){
+                cls = 'grid-table__element_active';
             } else {
-                cls = 'table-sortable__pagging-element';
+                cls = 'grid-table__element';
             }
             result = `<div class='${cls}' data-page-number=${countPage}>${countPage}</div>${result}`;
             countPage--;
         }
         
         let paggingLine = `
-        <div class='table-sortable__pagging-box'>
-            <div class='table-sortable__pagging-element_prev'><<</div>
+            <div class='grid-table__pagging-element-prev'><<</div>
             ${result}
-            <div class='table-sortable__pagging-element_next'>>></div>
-        </div>`;
+            <div class='grid-table__pagging-element-next'>>></div>`;
 
-        let paggingBox = this.el.querySelector('.table-sortable__pagging-box');
-        
-        if(paggingBox)
-            paggingBox.remove();
+        this.els.paging.innerHTML = '';
 
-        this.el.insertAdjacentHTML('beforeend', paggingLine);
+        this.els.paging.insertAdjacentHTML('afterbegin', paggingLine);
     }
 
-    table_sortable__head_cell(cls, event) {
+    grid_table__element(cls, event) {
         let tdHead = event.target.closest(cls);
 
         if (!tdHead) return;
 
-        let desc = false;
+        let head = event.target.closest('.grid-table__head');
 
-        if (
-            tdHead.classList.contains("asc") ||
-            tdHead.classList.contains("desc")
-        ) {
-            tdHead.classList.toggle("asc");
-            tdHead.classList.toggle("desc");
-            desc = tdHead.classList.contains("desc");
-        } else {
-            tdHead.classList.add("asc");
-        }
+        if (head) {
+            let desc = false;
 
-        let tds = this.el.querySelectorAll(cls);
-
-        tds.forEach(td => {
-            if (td != tdHead) {
-                td.classList.remove("asc");
-                td.classList.remove("desc");
+            if (
+                tdHead.classList.contains("asc") ||
+                tdHead.classList.contains("desc")
+            ) {
+                tdHead.classList.toggle("asc");
+                tdHead.classList.toggle("desc");
+                desc = tdHead.classList.contains("desc");
+            } else {
+                tdHead.classList.add("asc");
             }
-        });
+    
+            let tds = this.els.el.querySelectorAll(cls);
+    
+            tds.forEach(td => {
+                if (td != tdHead) {
+                    td.classList.remove("asc");
+                    td.classList.remove("desc");
+                }
+            });
 
-        this.sort(tdHead.cellIndex, desc);
+            this.sort(tdHead.dataset.nameCollumn, desc);
+        };
+
+        let padding = event.target.closest('.grid-table__pagging');
+
+        if(padding) {
+            this.currentPage(tdHead.dataset.pageNumber);
+        }
     }
 
-    table_sortable__input(cls, event) {
+    grid_table__element_input(cls, event) {
         let inputFilter = event.target.closest(cls);
 
         if (!inputFilter) return;
-
+        
         this.filter();
     }
 
-    table_sortable__pagging_element_prev(cls, event){
+    grid_table__pagging_element_prev(cls, event){
         let prev = event.target.closest(cls);
 
         if (!prev) return;
@@ -321,7 +334,7 @@ class TableSortable {
         this.prevPage();
     }
 
-    table_sortable__pagging_element_next(cls, event){
+    grid_table__pagging_element_next(cls, event){
         let next = event.target.closest(cls);
 
         if (!next) return;
@@ -329,27 +342,18 @@ class TableSortable {
         this.nextPage();
     }
 
-    table_sortable__pagging_element(cls, event){
-        let page = event.target.closest(cls);
-
-        if (!page) return;
-
-        this.currentPage(page.dataset.pageNumber);
-    }
-
     onClick(event) {
         [
-            '.table-sortable__head-cell', 
-            '.table-sortable__pagging-element_prev', 
-            '.table-sortable__pagging-element_next', 
-            '.table-sortable__pagging-element'
+            '.grid-table__pagging-element-prev',
+            '.grid-table__pagging-element-next',
+            '.grid-table__element',
         ].forEach(cls => {
             this._strategyOnClick(event, cls);
         });
     }
 
     onKeyup(event) {
-        this._strategyOnClick(event, ".table-sortable__input");
+        this._strategyOnClick(event, ".grid-table__element-input");
     }
 
     _strategyOnClick(event, cls) {

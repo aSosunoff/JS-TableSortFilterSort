@@ -1,4 +1,105 @@
-.container-table{
+.grid-table,
+.grid-table__col,
+.grid-table__head,
+.grid-table__body,
+.grid-table__filter,
+.grid-table__pagging {
+	display: grid;
+	gap: 2px;
+}
+
+.grid-table {
+	margin: 0 auto;
+	width: 760px;
+}
+
+.grid-table__col,
+.grid-table__head,
+.grid-table__filter {
+	grid-template-columns: repeat(auto-fit, minmax(0px, 1fr));
+}
+
+.grid-table__filter .grid-table__element {
+	text-align: center;
+	border: none;
+	padding: 0;
+}
+.grid-table__element-input {
+	width: 100%;
+	padding: 5px;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+
+.grid-table__head .grid-table__element.asc::after,
+.grid-table__head .grid-table__element.desc::after {
+	position: absolute;
+}
+.grid-table__head .grid-table__element.asc::after {
+	content: "▲";
+}
+.grid-table__head .grid-table__element.desc::after {
+	content: "▼";
+}
+
+.grid-table__element,
+.grid-table__pagging-element-prev,
+.grid-table__pagging-element-next {
+	border: 1px solid #a0a0a0;
+	text-align: center;
+	padding: 5px;
+}
+
+.grid-table__pagging {
+	justify-content: center;
+	grid-template-columns: repeat(auto-fit, 30px);
+	grid-template-rows: 30px;
+}
+
+.grid-table__pagging-element-prev,
+.grid-table__pagging-element-next,
+.grid-table__pagging .grid-table__element,
+.grid-table__element,
+.grid-table__element_active{
+	display: grid;
+	align-items: center;
+}
+
+.grid-table__head .grid-table__element {
+	transition: all 0.2s ease-in;
+	cursor: pointer;
+	background-color: #57a6ff;
+}
+.grid-table__head .grid-table__element:hover {
+	background-color: #ffffff;
+	box-shadow: 5px 5px 8px 0px #c1c1c1;
+}
+
+.grid-table__pagging .grid-table__element,
+.grid-table__pagging-element-next,
+.grid-table__pagging-element-prev,
+.grid-table__element_active {
+	cursor: pointer;
+	background-color: #ffffff;
+	transition: all 0.2s ease-in;
+	border: 1px solid #a0a0a0;
+	text-align: center;
+}
+
+.grid-table__pagging .grid-table__element:hover,
+.grid-table__pagging-element-next:hover,
+.grid-table__pagging-element-prev:hover {
+	background-color: #57a6ff;
+	box-shadow: 5px 5px 8px 0px #c1c1c1;
+}
+
+.grid-table__element_active {
+	background-color: #57a6ff;
+	box-shadow: 5px 5px 8px 0px #c1c1c1;
+}
+
+/* .container-table{
 	display: grid;
 	width: 760px;
 	margin: 0 auto;
@@ -76,4 +177,4 @@
 .table-sortable__pagging-element_active{
 	background-color: #57a6ff;
 	box-shadow: 5px 5px 8px 0px #c1c1c1;
-}
+} */
